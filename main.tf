@@ -7,12 +7,12 @@ terraform {
   }
 
   backend "s3" {
-    bucket         = "mohammed-terraform-state-2026"  # must match state_bucket_name above
-    key            = "vpc-project/terraform.tfstate"
-    region         = "us-east-1"
+    bucket       = "mohammed-terraform-state-2026" # must match state_bucket_name above
+    key          = "vpc-project/terraform.tfstate"
+    region       = "us-east-1"
     use_lockfile = true
-    encrypt        = true
-    profile        = "midoprofile"
+    encrypt      = true
+    profile      = "midoprofile"
   }
 
 }
