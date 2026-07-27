@@ -48,7 +48,7 @@ resource "aws_instance" "bastion_ec2" {
               EOF
 
   tags = {
-    Name = "bastion-ec2"
+    Name = "-bastion-ec2"
   }
 }
 
