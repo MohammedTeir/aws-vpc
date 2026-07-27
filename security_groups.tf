@@ -1,0 +1,63 @@
+resource "aws_security_group" "bastion_sg" {
+  name        = "bastion-sg"
+  description = "Allow SSH and outbound internet access"
+  vpc_id      = aws_vpc.production_vpc.id
+
+  tags = {
+    Name = "bastion-sg"
+  }
+}
+
+resource "aws_vpc_security_group_ingress_rule" "allow_http_ipv4" {
+  security_group_id = aws_security_group.bastion_sg.id
+  cidr_ipv4         = "0.0.0.0/0"
+  from_port         = 80
+  ip_protocol       = "tcp"
+  to_port           = 80
+}
+
+resource "aws_vpc_security_group_ingress_rule" "allow_https_ipv4" {
+  security_group_id = aws_security_group.bastion_sg.id
+  cidr_ipv4         = "0.0.0.0/0"
+  from_port         = 443
+  ip_protocol       = "tcp"
+  to_port           = 443
+}
+
+resource "aws_vpc_security_group_ingress_rule" "allow_ssh_ipv4" {
+  security_group_id = aws_security_group.bastion_sg.id
+  cidr_ipv4         = var.ssh_cidr
+  from_port         = 22
+  ip_protocol       = "tcp"
+  to_port           = 22
+}
+
+resource "aws_vpc_security_group_egress_rule" "allow_all_traffic_ipv4" {
+  security_group_id = aws_security_group.bastion_sg.id
+  cidr_ipv4         = "0.0.0.0/0"
+  ip_protocol       = "-1"
+}
+
+resource "aws_security_group" "private_sg" {
+  name        = "private-sg"
+  description = "Allow outbound internet access"
+  vpc_id      = aws_vpc.production_vpc.id
+
+  tags = {
+    Name = "private-sg"
+  }
+}
+
+resource "aws_vpc_security_group_ingress_rule" "allow_ssh_from_bastion" {
+  security_group_id            = aws_security_group.private_sg.id
+  referenced_security_group_id = aws_security_group.bastion_sg.id
+  from_port                    = 22
+  ip_protocol                  = "tcp"
+  to_port                      = 22
+}
+
+resource "aws_vpc_security_group_egress_rule" "allow_all_traffic_ipv4_private" {
+  security_group_id = aws_security_group.private_sg.id
+  cidr_ipv4         = "0.0.0.0/0"
+  ip_protocol       = "-1"
+}
