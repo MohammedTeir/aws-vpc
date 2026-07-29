@@ -59,6 +59,11 @@ resource "aws_eip" "nat_eip" {
   depends_on = [aws_internet_gateway.production_igw]
 }
 
+resource "aws_eip" "nat_eip_2" {
+  domain     = "vpc"
+  depends_on = [aws_internet_gateway.production_igw]
+}
+
 resource "aws_nat_gateway" "production_nat" {
   allocation_id = aws_eip.nat_eip.id
   subnet_id     = aws_subnet.public_subnet.id
@@ -66,6 +71,16 @@ resource "aws_nat_gateway" "production_nat" {
 
   tags = {
     Name = "production-nat"
+  }
+}
+
+resource "aws_nat_gateway" "production_nat_2" {
+  allocation_id = aws_eip.nat_eip_2.id
+  subnet_id     = aws_subnet.public_subnet_2.id
+  depends_on    = [aws_internet_gateway.production_igw]
+
+  tags = {
+    Name = "production-nat-2"
   }
 }
 
@@ -82,8 +97,17 @@ resource "aws_route_table" "private_route" {
   vpc_id = aws_vpc.production_vpc.id
 
   route {
-    cidr_block = "0.0.0.0/0"
-    gateway_id = aws_nat_gateway.production_nat.id
+    cidr_block     = "0.0.0.0/0"
+    nat_gateway_id = aws_nat_gateway.production_nat.id
+  }
+}
+
+resource "aws_route_table" "private_route_2" {
+  vpc_id = aws_vpc.production_vpc.id
+
+  route {
+    cidr_block     = "0.0.0.0/0"
+    nat_gateway_id = aws_nat_gateway.production_nat_2.id
   }
 }
 
@@ -104,7 +128,7 @@ resource "aws_route_table_association" "private_assoc" {
 
 resource "aws_route_table_association" "private_assoc_2" {
   subnet_id      = aws_subnet.private_subnet_2.id
-  route_table_id = aws_route_table.private_route.id
+  route_table_id = aws_route_table.private_route_2.id
 }
 
 resource "aws_lb" "production_alb" {
@@ -159,7 +183,7 @@ resource "aws_autoscaling_group" "production_asg" {
   health_check_grace_period = 300
   health_check_type         = "ELB"
   vpc_zone_identifier       = [aws_subnet.private_subnet.id, aws_subnet.private_subnet_2.id]
-  target_group_arns         = [aws_lb_target_group.production_lb_target_group_http.arn, aws_lb_target_group.production_lb_target_group_https.arn]
+  target_group_arns         = [aws_lb_target_group.production_lb_target_group_http.arn]
   launch_template {
     id      = aws_launch_template.production_launch_template.id
     version = "$Latest"
