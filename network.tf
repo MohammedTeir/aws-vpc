@@ -129,25 +129,7 @@ resource "aws_lb_target_group" "production_lb_target_group_http" {
   }
 }
 
-resource "aws_lb_target_group" "production_lb_target_group_https" {
-  name     = "production-target-group-https"
-  port     = 443
-  protocol = "HTTPS"
-  vpc_id   = aws_vpc.production_vpc.id
 
-  health_check {
-    path                = "/"
-    interval            = 30
-    timeout             = 5
-    healthy_threshold   = 2
-    unhealthy_threshold = 2
-    matcher             = "200-299"
-  }
-
-  tags = {
-    Name = "production-target-group-https"
-  }
-}
 
 resource "aws_lb_listener" "lb_listener_http" {
   load_balancer_arn = aws_lb.production_alb.arn
@@ -159,17 +141,6 @@ resource "aws_lb_listener" "lb_listener_http" {
   }
 }
 
-resource "aws_lb_listener" "lb_listener_https" {
-  load_balancer_arn = aws_lb.production_alb.arn
-  port              = 443
-  protocol          = "HTTPS"
-  ssl_policy        = "ELBSecurityPolicy-2016-08"
-  certificate_arn   = "arn:aws:iam::187416307283:server-certificate/test_cert_rab3wuqwgja25ct3n4jdj2tzu4"
-  default_action {
-    type             = "forward"
-    target_group_arn = aws_lb_target_group.production_lb_target_group_https.arn
-  }
-}
 
 resource "aws_autoscaling_group" "production_asg" {
   desired_capacity          = 2
