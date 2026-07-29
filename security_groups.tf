@@ -62,6 +62,14 @@ resource "aws_vpc_security_group_egress_rule" "allow_all_traffic_ipv4_private" {
   ip_protocol       = "-1"
 }
 
+resource "aws_vpc_security_group_ingress_rule" "allow_http_from_alb" {
+  security_group_id            = aws_security_group.private_sg.id
+  referenced_security_group_id = aws_security_group.alb_sg.id
+  from_port                    = 80
+  ip_protocol                  = "tcp"
+  to_port                      = 80
+}
+
 resource "aws_security_group" "alb_sg" {
   name        = "alb-sg"
   description = "Allow inbound HTTP and HTTPS traffic"
