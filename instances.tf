@@ -5,7 +5,6 @@ resource "aws_instance" "bastion_ec2" {
   subnet_id                   = aws_subnet.public_subnet.id
   vpc_security_group_ids      = [aws_security_group.bastion_sg.id]
   associate_public_ip_address = true
-  public_ip                   = true
 
   user_data = <<-EOF
               #!/bin/bash

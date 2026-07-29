@@ -187,7 +187,7 @@ resource "aws_lb_listener" "lb_listener_https" {
   }
 }
 
-resource "aws_auto_scaling_group" "production_asg" {
+resource "aws_autoscaling_group" "production_asg" {
   desired_capacity          = 2
   max_size                  = 4
   min_size                  = 2
