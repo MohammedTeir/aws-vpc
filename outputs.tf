@@ -1,8 +1,3 @@
-output "alb_public_ip" {
-  description = "Public IP address of the ALB"
-  value       = aws_eip.alb_eip.public_ip
-}
-
 output "bastion_private_ip" {
   description = "Private IP address of the bastion EC2 instance"
   value       = aws_instance.bastion_ec2.private_ip

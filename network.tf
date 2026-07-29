@@ -54,11 +54,6 @@ resource "aws_internet_gateway" "production_igw" {
   }
 }
 
-resource "aws_eip" "alb_eip" {
-  domain     = "vpc"
-  depends_on = [aws_internet_gateway.production_igw]
-}
-
 resource "aws_eip" "nat_eip" {
   domain     = "vpc"
   depends_on = [aws_internet_gateway.production_igw]
@@ -109,17 +104,6 @@ resource "aws_lb" "production_alb" {
   security_groups            = [aws_security_group.alb_sg.id]
   subnets                    = [aws_subnet.public_subnet.id, aws_subnet.public_subnet_2.id]
   enable_deletion_protection = true
-
-  subnet_mapping {
-    subnet_id     = aws_subnet.public_subnet.id
-    allocation_id = aws_eip.alb_eip.id
-  }
-  subnet_mapping {
-    subnet_id     = aws_subnet.public_subnet_2.id
-    allocation_id = aws_eip.alb_eip.id
-  }
-
-
   tags = {
     Name = "production-alb"
   }
