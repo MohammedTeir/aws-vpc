@@ -6,9 +6,9 @@ variable "aws_region" {
 
 variable "db_credentials" {
   description = "Database credentials in the format username:password"
-  type        = string
+  type        = list(string)
   sensitive   = true
-  default     = "admin:SecurePass123!"
+  default     = ["dbadmin", "SecurePass123"]
 
 }
 

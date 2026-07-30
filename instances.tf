@@ -82,16 +82,17 @@ resource "aws_db_instance" "production_rds" {
   engine                 = "mysql"
   engine_version         = "8.0"
   instance_class         = "db.t3.micro"
-  username               = split(":", var.db_credentials)[0]
-  password               = split(":", var.db_credentials)[1]
+  username               = var.db_credentials[0]
   parameter_group_name   = "default.mysql8.0"
   skip_final_snapshot    = true
   publicly_accessible    = false
   multi_az               = true
   vpc_security_group_ids = [aws_security_group.rds_sg.id]
   db_subnet_group_name   = aws_db_subnet_group.production_db_subnet_group.name
-
+  manage_master_user_password = true
   tags = {
     Name = "production-rds"
   }
 }
+
+/* After apply, AWS automatically creates a Secrets Manager secret (you can find its ARN via aws_db_instance.production_rds.master_user_secret[0].secret_arn) — your ASG instances would then need an IAM role permission (secretsmanager:GetSecretValue) scoped to that specific ARN to retrieve it at runtime, completing the least-privilege chain. */

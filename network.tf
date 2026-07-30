@@ -201,3 +201,16 @@ resource "aws_db_subnet_group" "production_db_subnet_group" {
   subnet_ids  = [aws_subnet.private_subnet.id, aws_subnet.private_subnet_2.id]
   description = "Subnet group for production RDS instances"
 }
+
+resource "aws_secretsmanager_secret" "db_credentials_secret" {
+  name        = "db-credentials-secret"
+  description = "Secret for database credentials"
+}
+
+resource "aws_secretsmanager_secret_version" "db_credentials_secret_version" {
+  secret_id     = aws_secretsmanager_secret.db_credentials_secret.id
+  secret_string = jsonencode({
+    username = var.db_credentials[0]
+    password = var.db_credentials[1]
+  })
+}
