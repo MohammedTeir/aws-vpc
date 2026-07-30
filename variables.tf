@@ -4,6 +4,14 @@ variable "aws_region" {
   default     = "us-east-1"
 }
 
+variable "db_credentials" {
+  description = "Database credentials in the format username:password"
+  type        = string
+  sensitive   = true
+  default     = "admin:SecurePass123!"
+
+}
+
 variable "aws_profile" {
   description = "AWS CLI profile used for authentication"
   type        = string

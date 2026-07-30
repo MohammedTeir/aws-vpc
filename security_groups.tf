@@ -101,3 +101,21 @@ resource "aws_vpc_security_group_egress_rule" "allow_all_traffic_ipv4_alb" {
   cidr_ipv4         = "0.0.0.0/0"
   ip_protocol       = "-1"
 }
+
+resource "aws_security_group" "rds_sg" {
+  name        = "rds-sg"
+  description = "Allow inbound MySQL traffic from private instances"
+  vpc_id      = aws_vpc.production_vpc.id
+
+  tags = {
+    Name = "rds-sg"
+  }
+}
+
+resource "aws_vpc_security_group_ingress_rule" "allow_mysql_from_private" {
+  security_group_id            = aws_security_group.rds_sg.id
+  referenced_security_group_id = aws_security_group.private_sg.id
+  from_port                    = 3306
+  ip_protocol                  = "tcp"
+  to_port                      = 3306
+}

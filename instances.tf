@@ -75,3 +75,23 @@ resource "aws_launch_template" "production_launch_template" {
               echo "Hello from Private Host" > /var/www/html/index.html
               EOF
 }
+
+resource "aws_db_instance" "production_rds" {
+  identifier             = "production-rds"
+  allocated_storage      = 20
+  engine                 = "mysql"
+  engine_version         = "8.0"
+  instance_class         = "db.t3.micro"
+  username               = split(":", var.db_credentials)[0]
+  password               = split(":", var.db_credentials)[1]
+  parameter_group_name   = "default.mysql8.0"
+  skip_final_snapshot    = true
+  publicly_accessible    = false
+  multi_az               = true
+  vpc_security_group_ids = [aws_security_group.rds_sg.id]
+  db_subnet_group_name   = aws_db_subnet_group.production_db_subnet_group.name
+
+  tags = {
+    Name = "production-rds"
+  }
+}

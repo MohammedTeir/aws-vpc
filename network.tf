@@ -196,3 +196,8 @@ resource "aws_autoscaling_group" "production_asg" {
   }
 }
 
+resource "aws_db_subnet_group" "production_db_subnet_group" {
+  name        = "production-db-subnet-group"
+  subnet_ids  = [aws_subnet.private_subnet.id, aws_subnet.private_subnet_2.id]
+  description = "Subnet group for production RDS instances"
+}
