@@ -105,3 +105,14 @@ resource "aws_elasticache_cluster" "production_elasticache" {
   subnet_group_name  = aws_elasticache_subnet_group.production_elasticache_subnet_group.name
   security_group_ids = [aws_security_group.elasticache_sg.id]
 }
+
+resource "aws_elasticache_replication_group" "production_elasticache_replication" {
+  replication_group_id       = "production-elasticache-replication"
+  description                = "Replication group for production ElastiCache"
+  node_type                  = "cache.t3.micro"
+  num_cache_clusters         = 2
+  automatic_failover_enabled = true
+  engine                     = "redis"
+  subnet_group_name          = aws_elasticache_subnet_group.production_elasticache_subnet_group.name
+  security_group_ids         = [aws_security_group.elasticache_sg.id]
+}
