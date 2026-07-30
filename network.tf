@@ -208,9 +208,15 @@ resource "aws_secretsmanager_secret" "db_credentials_secret" {
 }
 
 resource "aws_secretsmanager_secret_version" "db_credentials_secret_version" {
-  secret_id     = aws_secretsmanager_secret.db_credentials_secret.id
+  secret_id = aws_secretsmanager_secret.db_credentials_secret.id
   secret_string = jsonencode({
     username = var.db_credentials[0]
     password = var.db_credentials[1]
   })
+}
+
+resource "aws_elasticache_subnet_group" "production_elasticache_subnet_group" {
+  name        = "production-elasticache-subnet-group"
+  subnet_ids  = [aws_subnet.private_subnet.id, aws_subnet.private_subnet_2.id]
+  description = "Subnet group for production ElastiCache instances"
 }

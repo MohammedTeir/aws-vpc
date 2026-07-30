@@ -77,18 +77,18 @@ resource "aws_launch_template" "production_launch_template" {
 }
 
 resource "aws_db_instance" "production_rds" {
-  identifier             = "production-rds"
-  allocated_storage      = 20
-  engine                 = "mysql"
-  engine_version         = "8.0"
-  instance_class         = "db.t3.micro"
-  username               = var.db_credentials[0]
-  parameter_group_name   = "default.mysql8.0"
-  skip_final_snapshot    = true
-  publicly_accessible    = false
-  multi_az               = true
-  vpc_security_group_ids = [aws_security_group.rds_sg.id]
-  db_subnet_group_name   = aws_db_subnet_group.production_db_subnet_group.name
+  identifier                  = "production-rds"
+  allocated_storage           = 20
+  engine                      = "mysql"
+  engine_version              = "8.0"
+  instance_class              = "db.t3.micro"
+  username                    = var.db_credentials[0]
+  parameter_group_name        = "default.mysql8.0"
+  skip_final_snapshot         = true
+  publicly_accessible         = false
+  multi_az                    = true
+  vpc_security_group_ids      = [aws_security_group.rds_sg.id]
+  db_subnet_group_name        = aws_db_subnet_group.production_db_subnet_group.name
   manage_master_user_password = true
   tags = {
     Name = "production-rds"
@@ -96,3 +96,12 @@ resource "aws_db_instance" "production_rds" {
 }
 
 /* After apply, AWS automatically creates a Secrets Manager secret (you can find its ARN via aws_db_instance.production_rds.master_user_secret[0].secret_arn) — your ASG instances would then need an IAM role permission (secretsmanager:GetSecretValue) scoped to that specific ARN to retrieve it at runtime, completing the least-privilege chain. */
+
+resource "aws_elasticache_cluster" "production_elasticache" {
+  cluster_id         = "production-elasticache"
+  engine             = "redis"
+  node_type          = "cache.t3.micro"
+  num_cache_nodes    = 1
+  subnet_group_name  = aws_elasticache_subnet_group.production_elasticache_subnet_group.name
+  security_group_ids = [aws_security_group.elasticache_sg.id]
+}
