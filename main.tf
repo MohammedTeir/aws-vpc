@@ -4,6 +4,10 @@ terraform {
       source  = "hashicorp/aws"
       version = "~> 6.0"
     }
+    random = {
+      source  = "hashicorp/random"
+      version = "~> 3.0"
+    }
   }
 
   backend "s3" {
@@ -12,12 +16,14 @@ terraform {
     region       = "us-east-1"
     use_lockfile = true
     encrypt      = true
-    profile      = "midoprofile"
+    #  profile      = "midoprofile"
   }
 
 }
 
 provider "aws" {
-  region  = var.aws_region
-  profile = var.aws_profile
+  region = var.aws_region
+  # profile = var.aws_profile
 }
+
+
