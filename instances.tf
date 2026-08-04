@@ -59,7 +59,7 @@ resource "aws_launch_template" "production_launch_template" {
     security_groups             = [aws_security_group.private_sg.id]
   }
 
-  user_data = <<-EOF
+  user_data = base64encode(<<-EOF
               #!/bin/bash
               set -e
               sudo apt-get update -y
@@ -74,6 +74,7 @@ resource "aws_launch_template" "production_launch_template" {
               sudo systemctl restart nginx
               echo "Hello from Private Host" > /var/www/html/index.html
               EOF
+  )
 }
 
 resource "aws_db_instance" "production_rds" {
@@ -126,6 +127,7 @@ resource "aws_s3_bucket" "production_s3_bucket" {
   tags = {
     Name = "production-s3-bucket"
   }
+  force_destroy = true
 }
 
 resource "aws_s3_bucket_versioning" "production_s3_bucket_versioning" {
@@ -263,7 +265,7 @@ resource "aws_lambda_function" "s3_event_processor" {
   function_name = "s3_event_processor"
   role          = aws_iam_role.lambda_role.arn
   handler       = "index.handler"
-  runtime       = "nodejs14.x"
+  runtime       = "nodejs20.x"
   filename      = "lambda_function_payload.zip"
 
   source_code_hash = filebase64sha256("lambda_function_payload.zip")
@@ -332,6 +334,12 @@ resource "aws_config_configuration_recorder" "config_recorder" {
 
 }
 
+resource "aws_config_configuration_recorder_status" "recorder_status" {
+  name       = aws_config_configuration_recorder.config_recorder.name
+  is_enabled = true
+  depends_on = [aws_config_delivery_channel.config_delivery_channel]
+}
+
 resource "aws_config_delivery_channel" "config_delivery_channel" {
   name           = "config_delivery_channel"
   s3_bucket_name = aws_s3_bucket.production_s3_bucket.bucket
@@ -389,6 +397,8 @@ resource "aws_cloudtrail" "cloudtrail" {
   include_global_service_events = true
   is_multi_region_trail         = true
   enable_log_file_validation    = true
+  depends_on                    = [aws_s3_bucket_policy.combined_bucket_policy]
+
 }
 
 resource "aws_s3_bucket_policy" "combined_bucket_policy" {
