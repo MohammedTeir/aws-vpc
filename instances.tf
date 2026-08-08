@@ -6,11 +6,11 @@ resource "aws_instance" "bastion_ec2" {
   vpc_security_group_ids      = [aws_security_group.bastion_sg.id]
   associate_public_ip_address = true
   metadata_options {
-  http_tokens = "required"
+    http_tokens = "required"
   }
   root_block_device {
-  encrypted = true
-}
+    encrypted = true
+  }
   user_data = <<-EOF
               #!/bin/bash
               set -e

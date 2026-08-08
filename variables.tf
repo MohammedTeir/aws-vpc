@@ -4,6 +4,20 @@ variable "aws_region" {
   default     = "us-east-1"
 }
 
+variable "aws_dr_region" {
+  description = "AWS region for disaster recovery"
+  type        = string
+  default     = "eu-west-1"
+}
+
+variable "aws_alias_name" {
+
+  description = "Alias name for the AWS provider"
+  type        = string
+  default     = "dr_region"
+
+}
+
 variable "db_credentials" {
   description = "Database credentials in the format username:password"
   type        = list(string)
@@ -24,11 +38,25 @@ variable "vpc_cidr" {
   default     = "10.0.0.0/16"
 }
 
+variable "dr_vpc_cidr" {
+  description = "CIDR block for the VPC"
+  type        = string
+  default     = "10.1.0.0/16"
+}
+
 variable "public_subnet_cidr" {
   description = "CIDR block for the public subnet"
   type        = list(string)
   default     = ["10.0.1.0/24", "10.0.2.0/24"]
 }
+
+variable "public_subnet_cidr_dr" {
+  description = "CIDR block for the public subnet"
+  type        = list(string)
+  default     = ["10.1.1.0/24", "10.1.2.0/24"]
+}
+
+
 
 variable "private_subnet_cidr" {
   description = "CIDR block for the private subnet"
@@ -36,6 +64,12 @@ variable "private_subnet_cidr" {
   default     = ["10.0.3.0/24", "10.0.4.0/24"]
 }
 
+variable "private_subnet_cidr_dr" {
+  description = "CIDR block for the private subnet"
+  type        = list(string)
+  default     = ["10.1.3.0/24", "10.1.4.0/24"]
+
+}
 variable "ssh_cidr" {
   description = "Source CIDR allowed to reach the bastion over SSH"
   type        = string

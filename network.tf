@@ -6,6 +6,14 @@ resource "aws_vpc" "production_vpc" {
   }
 }
 
+resource "aws_vpc" "production_dr_vpc" {
+  cidr_block = var.dr_vpc_cidr
+  provider   = aws.dr_region
+  tags = {
+    Name = "dr-production-vpc"
+  }
+}
+
 resource "aws_subnet" "public_subnet" {
   vpc_id            = aws_vpc.production_vpc.id
   cidr_block        = var.public_subnet_cidr[0]
@@ -13,6 +21,17 @@ resource "aws_subnet" "public_subnet" {
 
   tags = {
     Name = "public-subnet"
+  }
+}
+
+resource "aws_subnet" "public_subnet_dr" {
+  vpc_id            = aws_vpc.production_dr_vpc.id
+  cidr_block        = var.public_subnet_cidr_dr[0]
+  availability_zone = "${var.aws_dr_region}a"
+  provider          = aws.dr_region
+
+  tags = {
+    Name = "public-subnet-dr"
   }
 }
 
@@ -26,6 +45,18 @@ resource "aws_subnet" "public_subnet_2" {
   }
 }
 
+resource "aws_subnet" "public_subnet_2_dr" {
+  assign_ipv6_address_on_creation = true
+  vpc_id                          = aws_vpc.production_dr_vpc.id
+  cidr_block                      = var.public_subnet_cidr_dr[1]
+  availability_zone               = "${var.aws_dr_region}b"
+  provider                        = aws.dr_region
+
+  tags = {
+    Name = "public-subnet-2-dr"
+  }
+}
+
 resource "aws_subnet" "private_subnet" {
   vpc_id            = aws_vpc.production_vpc.id
   cidr_block        = var.private_subnet_cidr[0]
@@ -36,6 +67,17 @@ resource "aws_subnet" "private_subnet" {
   }
 }
 
+resource "aws_subnet" "private_subnet_dr" {
+  vpc_id            = aws_vpc.production_dr_vpc.id
+  cidr_block        = var.private_subnet_cidr_dr[0]
+  availability_zone = "${var.aws_dr_region}a"
+  provider          = aws.dr_region
+
+  tags = {
+    Name = "private-subnet-dr"
+  }
+}
+
 resource "aws_subnet" "private_subnet_2" {
   vpc_id            = aws_vpc.production_vpc.id
   cidr_block        = var.private_subnet_cidr[1]
@@ -43,6 +85,17 @@ resource "aws_subnet" "private_subnet_2" {
 
   tags = {
     Name = "private-subnet-2"
+  }
+}
+
+resource "aws_subnet" "private_subnet_2_dr" {
+  vpc_id            = aws_vpc.production_dr_vpc.id
+  cidr_block        = var.private_subnet_cidr_dr[1]
+  availability_zone = "${var.aws_dr_region}b"
+  provider          = aws.dr_region
+
+  tags = {
+    Name = "private-subnet-2-dr"
   }
 }
 

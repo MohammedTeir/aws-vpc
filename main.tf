@@ -26,4 +26,9 @@ provider "aws" {
   # profile = var.aws_profile
 }
 
+provider "aws" {
+  alias   = "dr_region"
+  region  = var.aws_dr_region
+  # profile = var.aws_profile
+}
 
